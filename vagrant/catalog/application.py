@@ -37,6 +37,20 @@ def showCategory(category_id):
         'public_category.html', category=category, items=items)
 
 
+# Delete a category
+@app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
+def deleteCategory(category_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+
+    if request.method == 'POST':
+        session.delete(category)
+        session.commit()
+        flash('Category Successfully Deleted')
+        return redirect(url_for('showCategories'))
+    else:
+        return render_template('delete_category.html', category=category)
+
+
 # Show an item under a certain category
 @app.route('/category/<int:category_id>/item/<int:item_id>/')
 def showItem(category_id, item_id):
