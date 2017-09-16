@@ -1,0 +1,9 @@
+{% extends "main.html" %}
+{% block content %}
+
+<h1>{{category.name}}</h1>
+{% for item in items %}
+  <p>{{item.name}}</p>
+{% endfor %}
+<a href="{{url_for('showCategories')}}">Back to Categories page</a>
+{% endblock %}
