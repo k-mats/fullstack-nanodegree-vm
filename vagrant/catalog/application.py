@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from database_setup import Base, Category, Item
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -54,6 +54,7 @@ def deleteItem(category_id, item_id):
     if request.method == 'POST':
         session.delete(item)
         session.commit()
+        flash('Item Successfully Deleted')
         return redirect(url_for('showCategory', category_id=category_id))
     else:
         return render_template('delete_item.html', category=category, item=item)

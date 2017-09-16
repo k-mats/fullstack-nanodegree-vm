@@ -11,8 +11,8 @@ session = DBSession()
 
 # Create dummy data; Category
 category1 = Category(name="Baseball")
-category2 = Category(name="Football")
-category3 = Category(name="Tennis")
+category2 = Category(name="Tennis")
+category3 = Category(name="Football")
 
 session.add(category1)
 session.add(category2)
