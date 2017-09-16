@@ -37,6 +37,25 @@ def showCategory(category_id):
         'public_category.html', category=category, items=items)
 
 
+# Edit a category
+@app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
+def editCategory(category_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+
+    if request.method == 'POST':
+        if request.form['name']:
+            category.name = request.form['name']
+            session.add(category)
+            session.commit()
+            flash('Category Successfully Edited')
+            return redirect(url_for('showCategory', category_id=category_id))
+        else:
+            flash('Please fill in the edit form properly', 'error')
+            return render_template('edit_category.html', category=category)
+    else:
+        return render_template('edit_category.html', category=category)
+
+
 # Delete a category
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_id):
