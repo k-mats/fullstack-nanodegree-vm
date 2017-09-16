@@ -1,0 +1,16 @@
+{% extends "main.html" %}
+{% block content %}
+
+<p>Create new category</p>
+<form action="#" method="post">
+  <div>
+    <label for="name">Name:</label>
+    <input type ="text" maxlength="250" name="name">
+  </div>
+	<button type="submit">Save</button>
+</form>
+<a href="{{url_for('showCategories')}}">
+		<button>Cancel</button>
+</a>
+
+{% endblock %}

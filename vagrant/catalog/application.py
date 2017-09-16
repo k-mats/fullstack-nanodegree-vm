@@ -37,6 +37,23 @@ def showCategory(category_id):
         'public_category.html', category=category, items=items)
 
 
+# Add new category
+@app.route('/category/new', methods=['GET', 'POST'])
+def createCategory():
+    if request.method == 'POST':
+        if request.form['name']:
+            category = Category(name=request.form['name'])
+            session.add(category)
+            session.commit()
+            flash('Category Successfully Added')
+            return redirect(url_for('showCategories'))
+        else:
+            flash('Please fill in the form properly', 'error')
+            return render_template('create_category.html')
+    else:
+        return render_template('create_category.html')
+
+
 # Edit a category
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
