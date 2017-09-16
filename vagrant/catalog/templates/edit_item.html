@@ -1,0 +1,20 @@
+{% extends "main.html" %}
+{% block content %}
+
+<p>Edit item</p>
+<form action="#" method="post">
+  <div>
+    <label for="name">Name:</label>
+    <input type ="text" maxlength="80" name="name" value="{{item.name}}">
+  </div>
+  <div>
+    <label for="description">Description:</label>
+    <input type ="text" maxlength="250" name="description" value="{{item.description}}">
+  </div>
+	<button type="submit">Save</button>
+</form>
+<a href="{{url_for('showItem', category_id = category.id, item_id = item.id)}}">
+		<button>Cancel</button>
+</a>
+
+{% endblock %}

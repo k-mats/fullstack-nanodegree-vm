@@ -59,6 +59,27 @@ def showItem(category_id, item_id):
     return render_template('public_item.html', category=category, item=item)
 
 
+# Edit an item
+@app.route('/category/<int:category_id>/item/<int:item_id>/edit', methods=['GET', 'POST'])
+def editItem(category_id, item_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+    item = session.query(Item).filter_by(id=item_id).one()
+
+    if request.method == 'POST':
+        if request.form['name'] and request.form['description']:
+            item.name = request.form['name']
+            item.description = request.form['description']
+            session.add(item)
+            session.commit()
+            flash('Item Successfully Edited')
+            return redirect(url_for('showItem', category_id=category_id, item_id=item_id))
+        else:
+            flash('Please fill in the edit form properly', 'error')
+            return render_template('edit_item.html', category=category, item=item)
+    else:
+        return render_template('edit_item.html', category=category, item=item)
+
+
 # Delete an item
 @app.route('/category/<int:category_id>/item/<int:item_id>/delete', methods=['GET', 'POST'])
 def deleteItem(category_id, item_id):
