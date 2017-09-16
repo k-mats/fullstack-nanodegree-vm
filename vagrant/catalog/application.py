@@ -34,6 +34,13 @@ def showCategory(category_id):
         'public_category.html', category=category, items=items)
 
 
+# Show an item under a certain category
+@app.route('/category/<int:category_id>/item/<int:item_id>/')
+def showItem(category_id, item_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+    item = session.query(Item).filter_by(id=item_id).one()
+    return render_template('public_item.html', category=category, item=item)
+
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
