@@ -78,6 +78,27 @@ def showItem(category_id, item_id):
     return render_template('public_item.html', category=category, item=item)
 
 
+# Add new item to a certain category
+@app.route('/category/<int:category_id>/item/new', methods=['GET', 'POST'])
+def createItem(category_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+
+    if request.method == 'POST':
+        if request.form['name'] and request.form['description']:
+            item = Item(name=request.form['name'],
+                        description=request.form['description'],
+                        category_id=category.id)
+            session.add(item)
+            session.commit()
+            flash('Item Successfully Added')
+            return redirect(url_for('showCategory', category_id=category_id))
+        else:
+            flash('Please fill in the form properly', 'error')
+            return render_template('create_item.html', category=category)
+    else:
+        return render_template('create_item.html', category=category)
+
+
 # Edit an item
 @app.route('/category/<int:category_id>/item/<int:item_id>/edit', methods=['GET', 'POST'])
 def editItem(category_id, item_id):
