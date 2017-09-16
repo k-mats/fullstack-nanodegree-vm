@@ -21,7 +21,10 @@ session = DBSession()
 @app.route('/category/')
 def showCategories():
     categories = session.query(Category).order_by(asc(Category.name))
-    return render_template('public_categories.html', categories=categories)
+    if categories.count() == 0:
+        return render_template('empty_categories.html')
+    else:
+        return render_template('public_categories.html', categories=categories)
 
 
 # Show a category with its items
