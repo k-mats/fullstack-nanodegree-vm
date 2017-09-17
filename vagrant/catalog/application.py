@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
 from database_setup import Base, Category, Item
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -89,6 +89,21 @@ def editCategory(category_id):
         return render_template('edit_category.html', category=category)
 
 
+# API to edit a category
+# If the edit succeeds, the API returns the edited category.
+@app.route('%s/category/<int:category_id>/edit' % API_PATH, methods=['POST'])
+def editCategoryApi(category_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+
+    if request.json.get('name'):
+        category.name = request.json.get('name')
+        session.add(category)
+        session.commit()
+        return jsonify(category=category.serialize)
+    else:
+        return abort(400, 'Your request doesn\'t contain name')
+
+
 # Delete a category
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_id):
@@ -169,6 +184,22 @@ def editItem(category_id, item_id):
             return render_template('edit_item.html', category=category, item=item)
     else:
         return render_template('edit_item.html', category=category, item=item)
+
+
+# API to edit an item
+# If the edit succeeds, the API returns the edited item.
+@app.route('%s/category/<int:category_id>/item/<int:item_id>/edit' % API_PATH, methods=['POST'])
+def editItemApi(category_id, item_id):
+    item = session.query(Item).filter_by(id=item_id).one()
+
+    if request.json.get('name') and request.json.get('description'):
+        item.name = request.json.get('name')
+        item.description = request.json.get('description')
+        session.add(item)
+        session.commit()
+        return jsonify(item=item.serialize)
+    else:
+        return abort(400, 'Your request doesn\'t contain name or description')
 
 
 # Delete an item
