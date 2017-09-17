@@ -103,6 +103,17 @@ def deleteCategory(category_id):
         return render_template('delete_category.html', category=category)
 
 
+# API to delete a category
+# If the deletion succeeds, the API returns the deleted category.
+@app.route('%s/category/<int:category_id>/delete' % API_PATH, methods=['POST'])
+def deleteCategoryAPI(category_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+
+    session.delete(category)
+    session.commit()
+    return jsonify(category=category.serialize)
+
+
 # Show an item under a certain category
 @app.route('/category/<int:category_id>/item/<int:item_id>/')
 def showItem(category_id, item_id):
@@ -173,6 +184,18 @@ def deleteItem(category_id, item_id):
         return redirect(url_for('showCategory', category_id=category_id))
     else:
         return render_template('delete_item.html', category=category, item=item)
+
+
+# API to delete an item
+# If the deletion succeeds, the API returns the deleted item.
+@app.route('%s/category/<int:category_id>/item/<int:item_id>/delete' % API_PATH, methods=['POST'])
+def deleteItemApi(category_id, item_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+    item = session.query(Item).filter_by(id=item_id).one()
+
+    session.delete(item)
+    session.commit()
+    return jsonify(item=item.serialize)
 
 
 if __name__ == '__main__':
