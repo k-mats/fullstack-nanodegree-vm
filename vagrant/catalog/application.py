@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from database_setup import Base, Category, Item
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 
@@ -91,9 +92,14 @@ def editCategory(category_id):
 
 # API to edit a category
 # If the edit succeeds, the API returns the edited category.
+# If specified category doesn't exist, it returns 404.
+# If the request doesn't contain name key, it returns 400.
 @app.route('%s/category/<int:category_id>/edit' % API_PATH, methods=['POST'])
 def editCategoryApi(category_id):
-    category = session.query(Category).filter_by(id=category_id).one()
+    try:
+        category = session.query(Category).filter_by(id=category_id).one()
+    except SQLAlchemyError:
+        abort(404)
 
     if request.json.get('name'):
         category.name = request.json.get('name')
@@ -105,7 +111,7 @@ def editCategoryApi(category_id):
 
 
 # Delete a category
-@app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
+@app.route('/category/<int:category_id>/delete', methods=['POST'])
 def deleteCategory(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
 
@@ -120,9 +126,13 @@ def deleteCategory(category_id):
 
 # API to delete a category
 # If the deletion succeeds, the API returns the deleted category.
+# If specified category doesn't exist, it returns 404.
 @app.route('%s/category/<int:category_id>/delete' % API_PATH, methods=['POST'])
 def deleteCategoryAPI(category_id):
-    category = session.query(Category).filter_by(id=category_id).one()
+    try:
+        category = session.query(Category).filter_by(id=category_id).one()
+    except SQLAlchemyError:
+        abort(404)
 
     session.delete(category)
     session.commit()
@@ -188,9 +198,14 @@ def editItem(category_id, item_id):
 
 # API to edit an item
 # If the edit succeeds, the API returns the edited item.
+# If specified item doesn't exist, it returns 404.
+# If the request doesn't contain name or description key, it returns 400.
 @app.route('%s/category/<int:category_id>/item/<int:item_id>/edit' % API_PATH, methods=['POST'])
 def editItemApi(category_id, item_id):
-    item = session.query(Item).filter_by(id=item_id).one()
+    try:
+        item = session.query(Item).filter_by(id=item_id).one()
+    except SQLAlchemyError:
+        abort(404)
 
     if request.json.get('name') and request.json.get('description'):
         item.name = request.json.get('name')
@@ -219,10 +234,14 @@ def deleteItem(category_id, item_id):
 
 # API to delete an item
 # If the deletion succeeds, the API returns the deleted item.
+# If specified item doesn't exist, it returns 404.
 @app.route('%s/category/<int:category_id>/item/<int:item_id>/delete' % API_PATH, methods=['POST'])
 def deleteItemApi(category_id, item_id):
-    category = session.query(Category).filter_by(id=category_id).one()
-    item = session.query(Item).filter_by(id=item_id).one()
+    try:
+        category = session.query(Category).filter_by(id=category_id).one()
+        item = session.query(Item).filter_by(id=item_id).one()
+    except SQLAlchemyError:
+        abort(404)
 
     session.delete(item)
     session.commit()
