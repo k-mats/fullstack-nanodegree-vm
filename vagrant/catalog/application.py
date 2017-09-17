@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from database_setup import Base, Category, Item
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 app = Flask(__name__)
 
 APPLICATION_NAME = "Catalog Application"
-
+API_PATH = '/api/v1'
 
 # Connect to Database and create database session
 engine = create_engine('sqlite:///catalog.db')
@@ -27,6 +27,14 @@ def showCategories():
         return render_template('public_categories.html', categories=categories)
 
 
+# API to show all categories
+@app.route('%s/' % API_PATH)
+@app.route('%s/category/' % API_PATH)
+def showCategoriesApi():
+    categories = session.query(Category).order_by(asc(Category.name))
+    return jsonify(categories=[i.serialize for i in categories])
+
+
 # Show a category with its items
 @app.route('/category/<int:category_id>/')
 @app.route('/category/<int:category_id>/item/')
@@ -35,6 +43,14 @@ def showCategory(category_id):
     items = session.query(Item).filter_by(category_id=category_id).all()
     return render_template(
         'public_category.html', category=category, items=items)
+
+
+# API to show a category
+@app.route('%s/category/<int:category_id>/' % API_PATH)
+@app.route('%s/category/<int:category_id>/item/' % API_PATH)
+def showCategoryApi(category_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+    return jsonify(category=category.serialize)
 
 
 # Add new category
@@ -93,6 +109,13 @@ def showItem(category_id, item_id):
     category = session.query(Category).filter_by(id=category_id).one()
     item = session.query(Item).filter_by(id=item_id).one()
     return render_template('public_item.html', category=category, item=item)
+
+
+# API to show an item under a certain category
+@app.route('%s/category/<int:category_id>/item/<int:item_id>/' % API_PATH)
+def showItemAPI(category_id, item_id):
+    item = session.query(Item).filter_by(id=item_id).one()
+    return jsonify(item=item.serialize)
 
 
 # Add new item to a certain category
