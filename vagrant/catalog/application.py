@@ -71,6 +71,20 @@ def createCategory():
         return render_template('create_category.html')
 
 
+# API to add new category
+# If the creation succeeds, the API returns the created category.
+# If the request doesn't contain name key, it returns 400.
+@app.route('%s/category/new' % API_PATH, methods=['POST'])
+def createCategoryApi():
+    if request.json.get('name'):
+        category = Category(name=request.json.get('name'))
+        session.add(category)
+        session.commit()
+        return jsonify(item=category.serialize)
+    else:
+        return abort(400, 'Your request doesn\'t contain name')
+
+
 # Edit a category
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
@@ -173,6 +187,28 @@ def createItem(category_id):
             return render_template('create_item.html', category=category)
     else:
         return render_template('create_item.html', category=category)
+
+
+# API to add new item to a certain category
+# If the creation succeeds, the API returns the created item.
+# If specified category doesn't exist, it returns 404.
+# If the request doesn't contain name or description key, it returns 400.
+@app.route('%s/category/<int:category_id>/item/new' % API_PATH, methods=['POST'])
+def createItemApi(category_id):
+    try:
+        category = session.query(Category).filter_by(id=category_id).one()
+    except SQLAlchemyError:
+        abort(404)
+
+    if request.json.get('name') and request.json.get('description'):
+        item = Item(name=request.json.get('name'),
+                    description=request.json.get('description'),
+                    category_id=category.id)
+        session.add(item)
+        session.commit()
+        return jsonify(item=item.serialize)
+    else:
+        return abort(400, 'Your request doesn\'t contain name or description')
 
 
 # Edit an item
