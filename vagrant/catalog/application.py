@@ -118,8 +118,9 @@ def gconnect():
 
 # User Helper Functions
 def createUser(login_session):
-    newUser = User(name=login_session['username'], email=login_session[
-                   'email'], picture=login_session['picture'])
+    newUser = User(name=login_session['username'],
+                   email=login_session['email'],
+                   picture=login_session['picture'])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
@@ -219,7 +220,8 @@ def createCategory():
 
     if request.method == 'POST':
         if request.form['name']:
-            category = Category(name=request.form['name'])
+            category = Category(name=request.form['name'],
+                                user_id=login_session['user_id'])
             session.add(category)
             session.commit()
             flash('Category Successfully Added')
@@ -237,7 +239,8 @@ def createCategory():
 @app.route('%s/category/new' % API_PATH, methods=['POST'])
 def createCategoryApi():
     if request.json.get('name'):
-        category = Category(name=request.json.get('name'))
+        category = Category(name=request.json.get('name'),
+                            user_id=login_session['user_id'])
         session.add(category)
         session.commit()
         return jsonify(item=category.serialize)
@@ -351,7 +354,8 @@ def createItem(category_id):
         if request.form['name'] and request.form['description']:
             item = Item(name=request.form['name'],
                         description=request.form['description'],
-                        category_id=category.id)
+                        category_id=category.id,
+                        user_id=login_session['user_id'])
             session.add(item)
             session.commit()
             flash('Item Successfully Added')
@@ -377,7 +381,8 @@ def createItemApi(category_id):
     if request.json.get('name') and request.json.get('description'):
         item = Item(name=request.json.get('name'),
                     description=request.json.get('description'),
-                    category_id=category.id)
+                    category_id=category.id,
+                    user_id=login_session['user_id'])
         session.add(item)
         session.commit()
         return jsonify(item=item.serialize)
