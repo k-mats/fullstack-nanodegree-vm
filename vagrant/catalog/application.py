@@ -182,7 +182,7 @@ def showCategories():
     if categories.count() == 0:
         return render_template('empty_categories.html')
     else:
-        return render_template('public_categories.html', categories=categories)
+        return render_template('categories.html', categories=categories)
 
 
 # API to show all categories
@@ -199,8 +199,7 @@ def showCategoriesApi():
 def showCategory(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
     items = session.query(Item).filter_by(category_id=category_id).all()
-    return render_template(
-        'public_category.html', category=category, items=items)
+    return render_template('category.html', category=category, items=items)
 
 
 # API to show a category
@@ -331,7 +330,7 @@ def deleteCategoryAPI(category_id):
 def showItem(category_id, item_id):
     category = session.query(Category).filter_by(id=category_id).one()
     item = session.query(Item).filter_by(id=item_id).one()
-    return render_template('public_item.html', category=category, item=item)
+    return render_template('item.html', category=category, item=item)
 
 
 # API to show an item under a certain category
