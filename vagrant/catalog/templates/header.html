@@ -1,6 +1,9 @@
 <div>
-  <a id="login-link" href="{{url_for('showLogin')}}">Login</a>
-  <a id="logout-link" href="{{url_for('gdisconnect')}}">Logout</a>
+  {% if 'username' not in session %}
+    <a id="login-link" href="{{url_for('showLogin')}}">Login</a>
+  {% else %}
+    <a id="logout-link" href="{{url_for('gdisconnect')}}">Logout</a>
+  {% endif %}
 </div>
 
 <div class = "flash">
@@ -8,7 +11,7 @@
   {% if messages %}
   <ul>
     {% for category, message in messages %}
-    <li class="{{category}}"><strong>{{message}}</strong></li>
+      <li class="{{category}}"><strong>{{message}}</strong></li>
     {% endfor %}
   </ul>
   {% endif %}
