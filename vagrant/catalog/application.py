@@ -149,6 +149,7 @@ def getUserID(email):
 
 
 # Logout URL for Google OAuth
+# Redirect to the root "/" after successful logout.
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -168,9 +169,8 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        flash('Successfully logged out.')
+        return redirect(url_for('showCategories'))
     else:
         response = make_response(
             json.dumps('Failed to revoke token for given user.', 400))

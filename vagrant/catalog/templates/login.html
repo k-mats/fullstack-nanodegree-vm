@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 {% block content %}
 
-<div id="signInButton">
+<div id="google-signin-button">
   <span class="g-signin"
     data-scope="openid email"
     data-clientid="365324355442-oop7b464r9pauq6c6e170uahq7m99kvi.apps.googleusercontent.com"
@@ -16,10 +16,11 @@
 <div id="result"></div>
 
 <script>
+// Invoked after Google OAuth server successfully returns one-time code
 function signInCallback(authResult) {
   if (authResult['code']) {
     // Hide the sign-in button now that the user is authorized
-    $('#signinButton').attr('style', 'display: none');
+    $('#google-signin-button').attr('style', 'display: none');
 
     // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
     $.ajax({
