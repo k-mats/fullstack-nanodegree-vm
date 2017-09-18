@@ -20,12 +20,15 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'user_id': self.user_id
         }
 
 
@@ -37,6 +40,8 @@ class Item(Base):
     description = Column(String(250), nullable=False)
     category_id = Column(Integer, ForeignKey('category.id'))
     caregory = relationship(Category)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
@@ -44,7 +49,8 @@ class Item(Base):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'category_id': self.category_id
+            'category_id': self.category_id,
+            'user_id': self.user_id
         }
 
 engine = create_engine('sqlite:///catalog.db')
