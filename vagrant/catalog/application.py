@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort, make_response
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response
 from flask import session as login_session
 from database_setup import Base, User, Category, Item
 from sqlalchemy import create_engine, asc
@@ -243,7 +243,8 @@ def createCategoryApi():
         session.commit()
         return jsonify(item=category.serialize)
     else:
-        return abort(400, 'Your request doesn\'t contain name')
+        return make_response(
+            json.dumps("Your request doesn't contain name", 400))
 
 
 # Edit a category
@@ -274,7 +275,7 @@ def editCategoryApi(category_id):
     try:
         category = session.query(Category).filter_by(id=category_id).one()
     except SQLAlchemyError:
-        abort(404)
+        return make_response(json.dumps("Invalid category ID", 404))
 
     if request.json.get('name'):
         category.name = request.json.get('name')
@@ -282,7 +283,8 @@ def editCategoryApi(category_id):
         session.commit()
         return jsonify(category=category.serialize)
     else:
-        return abort(400, 'Your request doesn\'t contain name')
+        return make_response(
+            json.dumps("Your request doesn't contain name", 400))
 
 
 # Delete a category
@@ -307,7 +309,7 @@ def deleteCategoryAPI(category_id):
     try:
         category = session.query(Category).filter_by(id=category_id).one()
     except SQLAlchemyError:
-        abort(404)
+        return make_response(json.dumps("Invalid category ID", 404))
 
     session.delete(category)
     session.commit()
@@ -359,7 +361,7 @@ def createItemApi(category_id):
     try:
         category = session.query(Category).filter_by(id=category_id).one()
     except SQLAlchemyError:
-        abort(404)
+        return make_response(json.dumps("Invalid category ID", 404))
 
     if request.json.get('name') and request.json.get('description'):
         item = Item(name=request.json.get('name'),
@@ -369,7 +371,8 @@ def createItemApi(category_id):
         session.commit()
         return jsonify(item=item.serialize)
     else:
-        return abort(400, 'Your request doesn\'t contain name or description')
+        return make_response(
+            json.dumps("Your request doesn't contain name or description", 400))
 
 
 # Edit an item
@@ -402,7 +405,7 @@ def editItemApi(category_id, item_id):
     try:
         item = session.query(Item).filter_by(id=item_id).one()
     except SQLAlchemyError:
-        abort(404)
+        return make_response(json.dumps("Invalid item ID", 404))
 
     if request.json.get('name') and request.json.get('description'):
         item.name = request.json.get('name')
@@ -411,7 +414,8 @@ def editItemApi(category_id, item_id):
         session.commit()
         return jsonify(item=item.serialize)
     else:
-        return abort(400, 'Your request doesn\'t contain name or description')
+        return make_response(
+            json.dumps("Your request doesn't contain name or description", 400))
 
 
 # Delete an item
@@ -431,14 +435,14 @@ def deleteItem(category_id, item_id):
 
 # API to delete an item
 # If the deletion succeeds, the API returns the deleted item.
-# If specified item doesn't exist, it returns 404.
+# If specified category or item doesn't exist, it returns 404.
 @app.route('%s/category/<int:category_id>/item/<int:item_id>/delete' % API_PATH, methods=['POST'])
 def deleteItemApi(category_id, item_id):
     try:
         category = session.query(Category).filter_by(id=category_id).one()
         item = session.query(Item).filter_by(id=item_id).one()
     except SQLAlchemyError:
-        abort(404)
+        return make_response(json.dumps("Invalid category ID or item ID", 404))
 
     session.delete(item)
     session.commit()
