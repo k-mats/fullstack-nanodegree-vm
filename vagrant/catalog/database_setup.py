@@ -31,6 +31,9 @@ class Category(Base):
             'user_id': self.user_id
         }
 
+    def isOwnedBy(self, user_id):
+        return self.user_id == user_id
+
 
 class Item(Base):
     __tablename__ = 'item'
@@ -52,6 +55,9 @@ class Item(Base):
             'category_id': self.category_id,
             'user_id': self.user_id
         }
+
+    def isOwnedBy(self, user_id):
+        return self.user_id == user_id
 
 engine = create_engine('sqlite:///catalog.db')
 

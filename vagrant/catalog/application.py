@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, abort
 from flask import session as login_session
 from database_setup import Base, User, Category, Item
 from sqlalchemy import create_engine, asc
@@ -250,12 +250,16 @@ def createCategoryApi():
 
 # Edit a category
 # If the user doesn't log in, it redirects to the login page.
+# If the user isn't the owner of the category, it redirects to 403 page.
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
     if not isLoggedIn():
         return redirect(url_for('showLogin'))
 
     category = session.query(Category).filter_by(id=category_id).one()
+
+    if not category.isOwnedBy(login_session['user_id']):
+        return abort(403)
 
     if request.method == 'POST':
         if request.form['name']:
@@ -294,12 +298,16 @@ def editCategoryApi(category_id):
 
 # Delete a category
 # If the user doesn't log in, it redirects to the login page.
-@app.route('/category/<int:category_id>/delete', methods=['POST'])
+# If the user isn't the owner of the category, it redirects to 403 page.
+@app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_id):
     if not isLoggedIn():
         return redirect(url_for('showLogin'))
 
     category = session.query(Category).filter_by(id=category_id).one()
+
+    if not category.isOwnedBy(login_session['user_id']):
+        return abort(403)
 
     if request.method == 'POST':
         session.delete(category)
@@ -392,6 +400,7 @@ def createItemApi(category_id):
 
 # Edit an item
 # If the user doesn't log in, it redirects to the login page.
+# If the user isn't the owner of the item, it redirects to 403 page.
 @app.route('/category/<int:category_id>/item/<int:item_id>/edit', methods=['GET', 'POST'])
 def editItem(category_id, item_id):
     if not isLoggedIn():
@@ -399,6 +408,9 @@ def editItem(category_id, item_id):
 
     category = session.query(Category).filter_by(id=category_id).one()
     item = session.query(Item).filter_by(id=item_id).one()
+
+    if not item.isOwnedBy(login_session['user_id']):
+        return abort(403)
 
     if request.method == 'POST':
         if request.form['name'] and request.form['description']:
@@ -439,6 +451,7 @@ def editItemApi(category_id, item_id):
 
 # Delete an item
 # If the user doesn't log in, it redirects to the login page.
+# If the user isn't the owner of the item, it redirects to 403 page.
 @app.route('/category/<int:category_id>/item/<int:item_id>/delete', methods=['GET', 'POST'])
 def deleteItem(category_id, item_id):
     if not isLoggedIn():
@@ -446,6 +459,9 @@ def deleteItem(category_id, item_id):
 
     category = session.query(Category).filter_by(id=category_id).one()
     item = session.query(Item).filter_by(id=item_id).one()
+
+    if not item.isOwnedBy(login_session['user_id']):
+        return abort(403)
 
     if request.method == 'POST':
         session.delete(item)
