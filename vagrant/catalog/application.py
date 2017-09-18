@@ -139,6 +139,10 @@ def getUserID(email):
         return None
 
 
+def isLoggedIn():
+    return 'username' in login_session
+
+
 # Logout URL for Google OAuth
 # Redirect to the root "/" after successful logout.
 @app.route('/gdisconnect')
@@ -207,8 +211,12 @@ def showCategoryApi(category_id):
 
 
 # Add new category
+# If the user doesn't log in, it redirects to the login page.
 @app.route('/category/new', methods=['GET', 'POST'])
 def createCategory():
+    if not isLoggedIn():
+        return redirect(url_for('showLogin'))
+
     if request.method == 'POST':
         if request.form['name']:
             category = Category(name=request.form['name'])
@@ -239,8 +247,12 @@ def createCategoryApi():
 
 
 # Edit a category
+# If the user doesn't log in, it redirects to the login page.
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
+    if not isLoggedIn():
+        return redirect(url_for('showLogin'))
+
     category = session.query(Category).filter_by(id=category_id).one()
 
     if request.method == 'POST':
@@ -279,8 +291,12 @@ def editCategoryApi(category_id):
 
 
 # Delete a category
+# If the user doesn't log in, it redirects to the login page.
 @app.route('/category/<int:category_id>/delete', methods=['POST'])
 def deleteCategory(category_id):
+    if not isLoggedIn():
+        return redirect(url_for('showLogin'))
+
     category = session.query(Category).filter_by(id=category_id).one()
 
     if request.method == 'POST':
@@ -323,8 +339,12 @@ def showItemAPI(category_id, item_id):
 
 
 # Add new item to a certain category
+# If the user doesn't log in, it redirects to the login page.
 @app.route('/category/<int:category_id>/item/new', methods=['GET', 'POST'])
 def createItem(category_id):
+    if not isLoggedIn():
+        return redirect(url_for('showLogin'))
+
     category = session.query(Category).filter_by(id=category_id).one()
 
     if request.method == 'POST':
@@ -367,8 +387,12 @@ def createItemApi(category_id):
 
 
 # Edit an item
+# If the user doesn't log in, it redirects to the login page.
 @app.route('/category/<int:category_id>/item/<int:item_id>/edit', methods=['GET', 'POST'])
 def editItem(category_id, item_id):
+    if not isLoggedIn():
+        return redirect(url_for('showLogin'))
+
     category = session.query(Category).filter_by(id=category_id).one()
     item = session.query(Item).filter_by(id=item_id).one()
 
@@ -410,8 +434,12 @@ def editItemApi(category_id, item_id):
 
 
 # Delete an item
+# If the user doesn't log in, it redirects to the login page.
 @app.route('/category/<int:category_id>/item/<int:item_id>/delete', methods=['GET', 'POST'])
 def deleteItem(category_id, item_id):
+    if not isLoggedIn():
+        return redirect(url_for('showLogin'))
+
     category = session.query(Category).filter_by(id=category_id).one()
     item = session.query(Item).filter_by(id=item_id).one()
 
