@@ -1,10 +1,14 @@
 {% extends "main.html" %}
 {% block content %}
 
-<h1>Categories</h1>
+<h1 class="header">Categories</h1>
+
+<div class="collection">
 {% for category in categories %}
-  <p><a href="{{url_for('showCategory', category_id = category.id)}}">{{category.name}}</a></p>
+  <a class="collection-item blue-text" href="{{url_for('showCategory', category_id = category.id)}}">{{category.name}}</a>
 {% endfor %}
-<p><a href="{{url_for('createCategory')}}">Add Category</a></p>
+</div>
+
+<a class="btn blue" href="{{url_for('createCategory')}}">Add Category</a>
 
 {% endblock %}
