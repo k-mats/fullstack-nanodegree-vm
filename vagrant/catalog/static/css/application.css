@@ -1,7 +1,10 @@
 h1 {
   color: #2196f3;
   font-weight: 300;
-  padding: 0 10px;
+}
+
+#content-container {
+  margin: 10px;
 }
 
 #user-icon {
