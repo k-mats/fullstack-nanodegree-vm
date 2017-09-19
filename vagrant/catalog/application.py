@@ -349,8 +349,8 @@ def createCategory():
         return redirect(url_for('showLogin'))
 
     if request.method == 'POST':
-        if request.form['name']:
-            category = Category(name=request.form['name'],
+        if request.form['input-category-name']:
+            category = Category(name=request.form['input-category-name'],
                                 user_id=login_session['user_id'])
             session.add(category)
             session.commit()

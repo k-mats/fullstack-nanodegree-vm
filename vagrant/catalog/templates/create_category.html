@@ -1,16 +1,14 @@
 {% extends "main.html" %}
 {% block content %}
 
-<p>Create new category</p>
+<p>Create new category:</p>
 <form action="#" method="post">
-  <div>
-    <label for="name">Name:</label>
-    <input type ="text" maxlength="250" name="name">
+  <div class="input-field">
+    <label class="active" for="input-category-name">Name</label>
+    <input id="input-category-name" type="text" maxlength="250" name="input-category-name">
   </div>
-	<button type="submit">Save</button>
+	<button class="btn blue" type="submit">Save</button>
+  <a class="btn white blue-text" href="{{url_for('showCategories')}}">Cancel</a>
 </form>
-<a href="{{url_for('showCategories')}}">
-		<button>Cancel</button>
-</a>
 
 {% endblock %}
