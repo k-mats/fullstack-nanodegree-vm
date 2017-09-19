@@ -6,10 +6,10 @@
 
 {% if session['user_id'] == item.user_id %}
   <p>
-    <a href="{{url_for('editItem', category_id = category.id, item_id = item.id)}}">Edit</a>
-    <a href="{{url_for('deleteItem', category_id = category.id, item_id = item.id)}}">Delete</a>
+    <a class="btn blue" href="{{url_for('editItem', category_id = category.id, item_id = item.id)}}">Edit</a>
+    <a class="btn red" href="{{url_for('deleteItem', category_id = category.id, item_id = item.id)}}">Delete</a>
   </p>
 {% endif %}
-<p><a href="{{url_for('showCategory', category_id = category.id)}}">Back to {{category.name}} page</a></p>
-<p><a href="{{url_for('showCategories')}}">Back to Categories page</a></p>
+<p><a class="btn white blue-text" href="{{url_for('showCategory', category_id = category.id)}}">Back to {{category.name}} page</a></p>
+<p><a class="btn white blue-text" href="{{url_for('showCategories')}}">Back to Categories page</a></p>
 {% endblock %}

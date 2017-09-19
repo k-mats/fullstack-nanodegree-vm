@@ -2,11 +2,9 @@
 {% block content %}
 
 <p>Are you sure you want to delete {{item.name}}?</p>
-<form action="#" method="post">
-	<button type="submit">Delete</button>
+<form class="input-field" action="#" method="post">
+	<button class="btn red" type="submit">Delete</button>
+	<a class="btn white blue-text" href="{{url_for('showItem', category_id = category.id, item_id = item.id)}}">Cancel</a>
 </form>
-<a href="{{url_for('showItem', category_id = category.id, item_id = item.id)}}">
-		<button>Cancel</button>
-</a>
 
 {% endblock %}
