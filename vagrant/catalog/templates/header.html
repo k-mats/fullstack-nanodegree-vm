@@ -1,12 +1,18 @@
-<div>
-  {% if 'username' not in session %}
-    <a id="login-link" href="{{url_for('showLogin')}}">Login</a>
-  {% else %}
-    <img id="user-icon" src="{{session['picture']}}">
-    {{session['username']}}
-    <a id="logout-link" href="{{url_for('gdisconnect')}}">Logout</a>
-  {% endif %}
-</div>
+<nav>
+  <div class="nav-wrapper blue">
+    <a href="/" id="main-logo" class="brand-logo">My Catalog</a>
+    <ul id="nav-mobile" class="right hide-on-med-and-down">
+      {% if 'username' not in session %}
+        <li><a id="login-link" href="{{url_for('showLogin')}}">Login</a></li>
+      {% else %}
+        <li><a id="logout-link" href="{{url_for('gdisconnect')}}">Logout</a></li>
+        <li>
+          <img id="user-icon" class="circle" src="{{session['picture']}}">
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
 
 <div class = "flash">
   {% with messages = get_flashed_messages(with_categories = true) %}

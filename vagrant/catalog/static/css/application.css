@@ -1,7 +1,13 @@
 #user-icon {
- width: 30px;
- height: 30px;
- border-radius: 15px;
- -webkit-border-radius: 15px;
- -moz-border-radius: 15px;"
+ width: 40px;
+ height: 40px;
+ margin: 10px 10px;
+}
+
+#main-logo {
+  margin: 0 10px;
+}
+
+#google-signin-button {
+  margin: 20px;
 }
