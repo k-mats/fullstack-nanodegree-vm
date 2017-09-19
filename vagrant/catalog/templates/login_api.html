@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+{% block content %}
+
+<h1>Login with OAuth 2.0 </h1>
+
+<button class="g-signin2" id="google-signin-button-for-api">Sign in with Google</button>
+
+<div id="result"></div>
+
+<script>
+gapi.load('auth2', function() {
+  auth2 = gapi.auth2.init({
+    client_id: '365324355442-oop7b464r9pauq6c6e170uahq7m99kvi.apps.googleusercontent.com',
+  });
+});
+</script>
+
+<script>
+$('#google-signin-button-for-api').click(function() {
+  auth2.grantOfflineAccess({'redirect_uri': 'postmessage'}).then(signInCallback);
+});
+</script>
+
+<!--NEW GOOGLE SIGN IN CODE -->
+<script>
+function signInCallback(json) {
+  console.log('inside callback fuction');
+  console.log(json);
+  // authResult = JSON.parse(json);
+  authResult = json;
+  if (authResult['code']) {
+    // Hide the sign-in button now that the user is authorized, for example:
+    $('#google-signin-button-for-api').attr('style', 'display: none');
+      $('#result').html('One-Time Auth Code:</br>'+ authResult['code'] + '')
+  }
+}
+</script>
+
+{% endblock %}
