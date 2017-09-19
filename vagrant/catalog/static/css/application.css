@@ -20,3 +20,8 @@ h1 {
 #google-signin-button {
   margin: 20px;
 }
+
+#flash-messages {
+  margin: 0px;
+  padding: 0 10px;
+}

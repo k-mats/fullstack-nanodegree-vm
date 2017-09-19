@@ -14,10 +14,10 @@
   </div>
 </nav>
 
-<div class = "flash">
+<div class="flash">
   {% with messages = get_flashed_messages(with_categories = true) %}
   {% if messages %}
-  <ul>
+  <ul id="flash-messages" class="light-green white-text">
     {% for category, message in messages %}
       <li class="{{category}}"><strong>{{message}}</strong></li>
     {% endfor %}
