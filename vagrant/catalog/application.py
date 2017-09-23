@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, abort, g
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import jsonify, make_response, abort, g
 from flask import session as login_session
 from flask_httpauth import HTTPBasicAuth
 from database_setup import Base, User, Category, Item
@@ -6,7 +7,11 @@ from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
-import random, string, httplib2, json, requests
+import random
+import string
+import httplib2
+import json
+import requests
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -28,7 +33,7 @@ session = DBSession()
 def verify_token(token, password):
     user_id = User.verify_auth_token(token)
     if user_id:
-        user = session.query(User).filter_by(id = user_id).one()
+        user = session.query(User).filter_by(id=user_id).one()
     else:
         return False
     g.user = user
@@ -135,7 +140,7 @@ def gconnect():
     return redirect(url_for('showCategories'))
 
 
-@app.route('%s/gconnect' % API_PATH, methods = ['POST'])
+@app.route('%s/gconnect' % API_PATH, methods=['POST'])
 def gconnectApi():
     # Parse the auth code
     auth_code = request.json.get('auth_code')
@@ -153,7 +158,7 @@ def gconnectApi():
 
     # Check that the access token is valid.
     access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)  # noqa
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
     # If there was an error in the access token info, abort.
@@ -187,8 +192,8 @@ def gconnectApi():
     # Find User or make a new one
     # Get user info
     h = httplib2.Http()
-    userinfo_url =  "https://www.googleapis.com/oauth2/v1/userinfo"
-    params = {'access_token': credentials.access_token, 'alt':'json'}
+    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
 
     data = answer.json()
@@ -200,7 +205,7 @@ def gconnectApi():
     # see if user exists, if it doesn't make a new one
     user = session.query(User).filter_by(email=email).first()
     if not user:
-        user = User(name = name, picture = picture, email = email)
+        user = User(name=name, picture=picture, email=email)
         session.add(user)
         session.commit()
 
@@ -490,7 +495,7 @@ def createItem(category_id):
 # If the creation succeeds, the API returns the created item.
 # If specified category doesn't exist, it returns 404.
 # If the request doesn't contain name or description key, it returns 400.
-@app.route('%s/category/<int:category_id>/item/new' % API_PATH, methods=['POST'])
+@app.route('%s/category/<int:category_id>/item/new' % API_PATH, methods=['POST'])  # noqa
 @auth.login_required
 def createItemApi(category_id):
     try:
@@ -507,14 +512,14 @@ def createItemApi(category_id):
         session.commit()
         return jsonify(item=item.serialize)
     else:
-        return make_response(
-            json.dumps("Your request doesn't contain name or description", 400))
+        return make_response(json.dumps(
+            "Your request doesn't contain name or description", 400))
 
 
 # Edit an item
 # If the user doesn't log in, it redirects to the login page.
 # If the user isn't the owner of the item, it redirects to 403 page.
-@app.route('/category/<int:category_id>/item/<int:item_id>/edit', methods=['GET', 'POST'])
+@app.route('/category/<int:category_id>/item/<int:item_id>/edit', methods=['GET', 'POST'])  # noqa
 def editItem(category_id, item_id):
     if not isLoggedIn():
         return redirect(url_for('showLogin'))
@@ -532,10 +537,12 @@ def editItem(category_id, item_id):
             session.add(item)
             session.commit()
             flash('Item Successfully Edited')
-            return redirect(url_for('showItem', category_id=category_id, item_id=item_id))
+            return redirect(
+                url_for('showItem', category_id=category_id, item_id=item_id))
         else:
             flash('Please fill in the edit form properly', 'error')
-            return render_template('edit_item.html', category=category, item=item)
+            return render_template(
+                'edit_item.html', category=category, item=item)
     else:
         return render_template('edit_item.html', category=category, item=item)
 
@@ -546,7 +553,7 @@ def editItem(category_id, item_id):
 # If specified item doesn't exist, it returns 404.
 # If the user isn't the owner of the item, it returns 403.
 # If the request doesn't contain name or description key, it returns 400.
-@app.route('%s/category/<int:category_id>/item/<int:item_id>/edit' % API_PATH, methods=['POST'])
+@app.route('%s/category/<int:category_id>/item/<int:item_id>/edit' % API_PATH, methods=['POST'])  # noqa
 @auth.login_required
 def editItemApi(category_id, item_id):
     try:
@@ -565,14 +572,14 @@ def editItemApi(category_id, item_id):
         session.commit()
         return jsonify(item=item.serialize)
     else:
-        return make_response(
-            json.dumps("Your request doesn't contain name or description", 400))
+        return make_response(json.dumps(
+            "Your request doesn't contain name or description", 400))
 
 
 # Delete an item
 # If the user doesn't log in, it redirects to the login page.
 # If the user isn't the owner of the item, it redirects to 403 page.
-@app.route('/category/<int:category_id>/item/<int:item_id>/delete', methods=['GET', 'POST'])
+@app.route('/category/<int:category_id>/item/<int:item_id>/delete', methods=['GET', 'POST'])  # noqa
 def deleteItem(category_id, item_id):
     if not isLoggedIn():
         return redirect(url_for('showLogin'))
@@ -589,7 +596,8 @@ def deleteItem(category_id, item_id):
         flash('Item Successfully Deleted')
         return redirect(url_for('showCategory', category_id=category_id))
     else:
-        return render_template('delete_item.html', category=category, item=item)
+        return render_template(
+            'delete_item.html', category=category, item=item)
 
 
 # API to delete an item
@@ -597,7 +605,7 @@ def deleteItem(category_id, item_id):
 # If the deletion succeeds, the API returns the deleted item.
 # If specified category or item doesn't exist, it returns 404.
 # If the user isn't the owner of the item, it returns 403.
-@app.route('%s/category/<int:category_id>/item/<int:item_id>/delete' % API_PATH, methods=['POST'])
+@app.route('%s/category/<int:category_id>/item/<int:item_id>/delete' % API_PATH, methods=['POST'])  # noqa
 @auth.login_required
 def deleteItemApi(category_id, item_id):
     try:
