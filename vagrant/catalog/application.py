@@ -26,16 +26,12 @@ session = DBSession()
 
 @auth.verify_password
 def verify_token(token, password):
-    print("foo")
     user_id = User.verify_auth_token(token)
     if user_id:
-        print("bar")
         user = session.query(User).filter_by(id = user_id).one()
     else:
-        print("baz")
         return False
     g.user = user
-    print("fuz")
     return True
 
 
@@ -187,7 +183,6 @@ def gconnectApi():
             json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print "Step 2 Complete! Access Token : %s " % credentials.access_token
 
     # Find User or make a new one
     # Get user info
@@ -274,37 +269,6 @@ def gdisconnect():
         return response
 
 
-# API to logout URL for Google OAuth
-# Return 200 after successful logout.
-@app.route('%s/gdisconnect' % API_PATH)
-def gdisconnectApi():
-    # Only disconnect a connected user.
-    access_token = login_session.get('access_token')
-    if access_token is None:
-        response = make_response(
-            json.dumps('Current user not connected.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
-    h = httplib2.Http()
-    result = h.request(url, 'GET')[0]
-    if result['status'] == '200':
-        del login_session['access_token']
-        del login_session['gplus_id']
-        del login_session['username']
-        del login_session['email']
-        del login_session['picture']
-        response = make_response(json.dumps('logged out successfully.', 200))
-        response.headers['Content-Type'] = 'application/json'
-        return response
-    else:
-        response = make_response(
-            json.dumps('Failed to revoke token for given user.', 400))
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-
 # Show all categories
 @app.route('/')
 @app.route('/category/')
@@ -372,7 +336,7 @@ def createCategory():
 def createCategoryApi():
     if request.json.get('name'):
         category = Category(name=request.json.get('name'),
-                            user_id=login_session['user_id'])
+                            user_id=g.user.id)
         session.add(category)
         session.commit()
         return jsonify(item=category.serialize)
@@ -412,6 +376,7 @@ def editCategory(category_id):
 # User needs to login before the access
 # If the edit succeeds, the API returns the edited category.
 # If specified category doesn't exist, it returns 404.
+# If the user isn't the owner of the caategory, it returns 403.
 # If the request doesn't contain name key, it returns 400.
 @app.route('%s/category/<int:category_id>/edit' % API_PATH, methods=['POST'])
 @auth.login_required
@@ -420,6 +385,10 @@ def editCategoryApi(category_id):
         category = session.query(Category).filter_by(id=category_id).one()
     except SQLAlchemyError:
         return make_response(json.dumps("Invalid category ID", 404))
+
+    if not category.isOwnedBy(g.user.id):
+        return make_response(
+            json.dumps("It is not owned by you.", 403))
 
     if request.json.get('name'):
         category.name = request.json.get('name')
@@ -456,6 +425,7 @@ def deleteCategory(category_id):
 # API to delete a category
 # User needs to login before the access
 # If the deletion succeeds, the API returns the deleted category.
+# If the user isn't the owner of the caategory, it returns 403.
 # If specified category doesn't exist, it returns 404.
 @app.route('%s/category/<int:category_id>/delete' % API_PATH, methods=['POST'])
 @auth.login_required
@@ -464,6 +434,10 @@ def deleteCategoryAPI(category_id):
         category = session.query(Category).filter_by(id=category_id).one()
     except SQLAlchemyError:
         return make_response(json.dumps("Invalid category ID", 404))
+
+    if not category.isOwnedBy(g.user.id):
+        return make_response(
+            json.dumps("It is not owned by you.", 403))
 
     session.delete(category)
     session.commit()
@@ -528,7 +502,7 @@ def createItemApi(category_id):
         item = Item(name=request.json.get('name'),
                     description=request.json.get('description'),
                     category_id=category.id,
-                    user_id=login_session['user_id'])
+                    user_id=g.user.id)
         session.add(item)
         session.commit()
         return jsonify(item=item.serialize)
@@ -570,6 +544,7 @@ def editItem(category_id, item_id):
 # User needs to login before the access
 # If the edit succeeds, the API returns the edited item.
 # If specified item doesn't exist, it returns 404.
+# If the user isn't the owner of the item, it returns 403.
 # If the request doesn't contain name or description key, it returns 400.
 @app.route('%s/category/<int:category_id>/item/<int:item_id>/edit' % API_PATH, methods=['POST'])
 @auth.login_required
@@ -578,6 +553,10 @@ def editItemApi(category_id, item_id):
         item = session.query(Item).filter_by(id=item_id).one()
     except SQLAlchemyError:
         return make_response(json.dumps("Invalid item ID", 404))
+
+    if not item.isOwnedBy(g.user.id):
+        return make_response(
+            json.dumps("It is not owned by you.", 403))
 
     if request.json.get('name') and request.json.get('description'):
         item.name = request.json.get('name')
@@ -617,6 +596,7 @@ def deleteItem(category_id, item_id):
 # User needs to login before the access
 # If the deletion succeeds, the API returns the deleted item.
 # If specified category or item doesn't exist, it returns 404.
+# If the user isn't the owner of the item, it returns 403.
 @app.route('%s/category/<int:category_id>/item/<int:item_id>/delete' % API_PATH, methods=['POST'])
 @auth.login_required
 def deleteItemApi(category_id, item_id):
@@ -625,6 +605,10 @@ def deleteItemApi(category_id, item_id):
         item = session.query(Item).filter_by(id=item_id).one()
     except SQLAlchemyError:
         return make_response(json.dumps("Invalid category ID or item ID", 404))
+
+    if not item.isOwnedBy(g.user.id):
+        return make_response(
+            json.dumps("It is not owned by you.", 403))
 
     session.delete(item)
     session.commit()

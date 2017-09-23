@@ -32,7 +32,7 @@ class User(Base):
         except BadSignature:
             #Invalid Token
             return None
-            user_id = data['id']
+        user_id = data['id']
         return user_id
 
 
