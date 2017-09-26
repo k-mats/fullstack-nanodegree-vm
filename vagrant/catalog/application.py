@@ -12,12 +12,14 @@ import string
 import httplib2
 import json
 import requests
+import os
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 
-CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+ROOT = os.path.realpath(os.path.dirname(__file__))
+CLIENT_SECRETS = os.path.join(ROOT, "client_secrets.json")
+CLIENT_ID = json.loads(open(CLIENT_SECRETS, 'r').read())['web']['client_id']
 APPLICATION_NAME = "Catalog Application"
 API_PATH = '/api/v1'
 
@@ -70,7 +72,7 @@ def gconnect():
     auth_code = request.data
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets(CLIENT_SECRETS, scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(auth_code)
     except FlowExchangeError:
@@ -147,7 +149,7 @@ def gconnectApi():
     # Exchange for a token
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets(CLIENT_SECRETS, scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(auth_code)
     except FlowExchangeError:
