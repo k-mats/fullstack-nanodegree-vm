@@ -12,10 +12,12 @@ reload: clean setup fill
 
 # Delete all files related to DB
 clean:
-	-rm *.db database_setup.pyc
+	-rm database_setup.pyc
+	-psql -c 'drop database catalog;'
 
 # Create DB
 setup:
+	psql -c 'create database catalog;'
 	python database_setup.py
 
 # Fill tables with dummy data

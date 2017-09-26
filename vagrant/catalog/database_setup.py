@@ -83,7 +83,7 @@ class Item(Base):
     def isOwnedBy(self, user_id):
         return self.user_id == user_id
 
-engine = create_engine('sqlite:///catalog.db')
+engine = create_engine('postgresql:///catalog')
 
 
 Base.metadata.create_all(engine)
